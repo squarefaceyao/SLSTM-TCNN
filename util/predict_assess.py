@@ -1,13 +1,10 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from util.data_ultimately import data_ultimately
-import math
+
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_squared_error
 from util.frechet import get_similarity
 import seaborn as sns
-import os
 import time
 localtime = time.asctime( time.localtime(time.time()) )
 # plt 图片大小

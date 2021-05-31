@@ -1,35 +1,17 @@
 import numpy as np
 import pandas as pd
-from keras.utils import np_utils
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from tensorflow import keras
-import tensorflow as tf
 import math
-from scipy.stats import pearsonr
-from sklearn.metrics import mean_squared_error
 import seaborn as sns
-from sklearn.model_selection import train_test_split, ShuffleSplit, KFold
-
-
-
-
-from util.k_fold import kfold
+from sklearn.model_selection import KFold
 from util.data_ultimately import data_ultimately,data_dispose
-from util.frechet import get_similarity
-from util.model_1 import model_3,model_4
-from util.predict_assess import show_wave,assessment
-
-
-
+from util.model_1 import model_4
+from util.predict_assess import assessment
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import time
 localtime = time.asctime( time.localtime(time.time()) )
 import datetime
 starttime = datetime.datetime.now()
-#long running
-#do something other
 
 
 '''
@@ -72,8 +54,6 @@ df_T = pd.read_csv(f'Datasets/{wheat}_DS1_240.csv').T
 xx1,yy1 = data_dispose(df_T) # 调用切分数据函数
 xx = np.array(xx1, dtype=np.float32) # /100
 yy = np.array(yy1, dtype=np.float32) # /100
-# inputs = xx.reshape(len(xx),xx.shape[1],1) # 转换成三个维度
-# targets = yy.reshape(len(yy),yy.shape[1]) # 转换成二个维度
 
 inputs = xx.reshape(len(xx),xx.shape[1],1) # 转换成三个维度
 targets = yy.reshape(len(yy),yy.shape[1]) # 转换成二个维度

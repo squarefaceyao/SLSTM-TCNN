@@ -1,21 +1,12 @@
 from sklearn.model_selection import KFold
 import numpy as np
-import pandas as pd
-from keras.utils import np_utils
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from util.model_1 import model_3,cnn_model_2,cnn_model
-from util.data_ultimately import data_ultimately
-from tensorflow import keras
-import tensorflow as tf
 import math
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_squared_error
 from util.frechet import get_similarity
-import seaborn as sns
-import os
 import time
-from sklearn.metrics import classification_report
 localtime = time.asctime( time.localtime(time.time()) )
 from numpy import argmax
 from sklearn.metrics import roc_curve, auc
