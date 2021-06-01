@@ -4,10 +4,12 @@
  
  
  -  训练预测模型
- ```python
- mkdir model
+ ```
+cd SLSTM-TCNN
+
+mkdir model
  
- python3 pred_train.py
+python3 pred_train.py
  ```
  
  

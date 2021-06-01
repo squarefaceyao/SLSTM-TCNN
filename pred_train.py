@@ -35,10 +35,10 @@ fontsize = 21
 # 保存评价指标
 
 #输入的参数
-expriment_num = 2  # 试验次数。进行几次交叉验证
+expriment_num = 3  # 试验次数。进行几次交叉验证
 epochs = 600 # 训练次数，600
-n_splits =  10 # 折数，n_splits折交叉验证,10
-wheat = 'DK' # DK or LD
+n_splits = 10 # 折数，n_splits折交叉验证,10
+wheat = 'LD' # DK or LD
 
 # 保存训练的模型
 model_savePath = 'model/{}不同盐浓度预测模型/{}/'.format(wheat,localtime)
@@ -49,7 +49,11 @@ else:
     print('每个盐浓度预测时候的模型保存在文件夹:"{}"'.format(model_savePath)) 
 
 # df_T = pd.read_csv('../数据集/{}-9预测数据集标签是0-8.csv'.format(wheat)).T
-df_T = pd.read_csv(f'Datasets/{wheat}_DS1_240.csv').T
+
+if wheat == 'DK':
+    df_T = pd.read_csv(f'Datasets/{wheat}_DS1_240.csv').T
+else:
+    df_T = pd.read_csv('Datasets/LD_DS1_163.csv').T
 
 xx1,yy1 = data_dispose(df_T) # 调用切分数据函数
 xx = np.array(xx1, dtype=np.float32) # /100
@@ -65,6 +69,7 @@ num_folds = int(math.log(xx.shape[1]))+1
 kfold = KFold(n_splits=n_splits, shuffle=True)
 # K-fold Cross Validation model evaluation
 i_Mean_MSE, i_Mean_pcc, i_Mean_fre= [],[],[]
+i_Var_MSE, i_Var_pcc, i_Var_fre= [],[],[]
 CV_Mean_MSE, CV_Var_MSE = [],[]
 CV_Mean_pcc, CV_Var_pcc = [],[]
 CV_Mean_fre, CV_Var_fre = [],[]
@@ -122,10 +127,17 @@ for i in range(expriment_num):
         # Increase fold number
         fold_no = fold_no + 1
 
+    # 这里保存每次实验的结果 10折交叉验证评价指标的平均值
     i_Mean_MSE.append(np.mean(mse_per_fold))
     i_Mean_pcc.append(np.mean(pcc_per_fold))
     i_Mean_fre.append(np.mean(fre_per_fold))
 
+    # 这里保存每次实验的结果 10折交叉验证评价指标的方差
+    i_Var_MSE.append(np.var(mse_per_fold, ddof=1))
+    i_Var_pcc.append(np.var(pcc_per_fold, ddof=1))
+    i_Var_fre.append(np.var(fre_per_fold, ddof=1))
+
+    # 这里输出每次实验的结果
     print('------------------------------------------------------------------------')
     print('pcc fre mae per fold')
     for i in range(0, len(pcc_per_fold)):
@@ -133,29 +145,33 @@ for i in range(expriment_num):
         print(f'> Fold {i+1} - pcc: {pcc_per_fold[i]} - fre: {fre_per_fold[i]} - mse:{mse_per_fold[i]}%')
     print('------------------------------------------------------------------------')
     print('Average scores for all folds:')
-    print(f'> pcc: {np.mean(pcc_per_fold)} (+- {np.std(pcc_per_fold)})')
-    print(f'> fre: {np.mean(fre_per_fold)} (+- {np.std(fre_per_fold)})')
-    print(f'> mse: {np.mean(mse_per_fold)} (+- {np.std(mse_per_fold)})')
+    print(f'> pcc: {np.mean(pcc_per_fold)} (+- {np.var(pcc_per_fold, ddof=1)})')
+    print(f'> fre: {np.mean(fre_per_fold)} (+- {np.var(fre_per_fold, ddof=1)})')
+    print(f'> mse: {np.mean(mse_per_fold)} (+- {np.var(mse_per_fold, ddof=1)})')
 
     print('------------------------------------------------------------------------')
 
 
-CV_Mean_MSE.append(np.mean(i_Mean_MSE))
-CV_Var_MSE.append(np.var(i_Mean_MSE, ddof = 1))
-
-CV_Mean_pcc.append(np.mean(i_Mean_pcc))
-CV_Var_pcc.append(np.var(i_Mean_pcc, ddof = 1))
-
-
-CV_Mean_fre.append(np.mean(i_Mean_fre))
-CV_Var_fre.append(np.var(i_Mean_fre, ddof = 1))
-
+# 进行格式转换，保存为csv格式
 #Convert to numpy for convenience
-CV_Mean_MSE  = np.asarray(CV_Mean_MSE)
-CV_Var_MSE  = np.asarray(CV_Var_MSE)
-print(CV_Mean_fre)
+CV_Mean_MSE  = np.asarray(i_Mean_MSE)
+CV_Var_MSE  = np.asarray(i_Var_MSE)
+#Convert to numpy for convenience
+CV_Mean_pcc = np.asarray(i_Mean_pcc)
+CV_Var_pcc = np.asarray(i_Var_pcc)
 
+CV_Mean_fre = np.asarray(i_Mean_fre)
+CV_Var_fre = np.asarray(i_Var_fre)
 
+df = pd.DataFrame({"CV_Mean_MSE" : CV_Mean_MSE,
+                   "CV_Var_MSE" : CV_Var_MSE,
+                   "CV_Mean_pcc" : CV_Mean_pcc,
+                   "CV_Var_pcc" : CV_Var_pcc,
+                   "CV_Mean_fre" : CV_Mean_fre,
+                   "CV_Var_fre" : CV_Var_fre
+                   })
+
+df.to_csv(f"./result/{localtime}_CV_Result.csv", index=False)
     
         
 
