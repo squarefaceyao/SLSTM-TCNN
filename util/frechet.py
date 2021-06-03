@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import math
-
+import sys
+sys.setrecursionlimit(1500) 
 """
 计算弗雷德距离，输入数据为两个一维数组，shape=[N,]
 """
