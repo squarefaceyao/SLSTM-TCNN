@@ -1,15 +1,22 @@
-import tensorflow as tf
+# 使用LD_DS2(54条), DK_DS2(54条)的a波形预测9个盐浓度刺激下的b波形
+"""
+1 选择pcc最大的模型
+2 根据标签读取不同盐刺激浓度的a波
+
+"""
 import numpy as np
 import pandas as pd
 from util.data_ultimately import data_ultimately,data_dispose
 from util.predict_assess import show_wave,assessment
 import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import time
+localtime = time.asctime( time.localtime(time.time()) )
 import datetime
+starttime = datetime.datetime.now()
 from tensorflow import keras
 now = int(round(time.time()*1000))
 localtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(now/1000))
-import matplotlib.pyplot as plt
 
 # 注意： 预测用的x需要不一样。
 """
@@ -25,7 +32,7 @@ from fnmatch import fnmatch
 canshu = [1.12,1.23,1.31,1.37,1.43,1.51,1.6,1.7,1.8] # 为了每次保存的a波形都不一样。波形乘的数字越大，幅值越低。
 salt = [0,50,100,150,200,250,300,350,400] # 根据salt值选择模型和保存预测的数据
 #输入的参数
-wheat = 'DK' # DK or LD
+wheat = 'LD' # DK or LD
 test = ['0mM','50mM','100mM','150mM','200mM','250mM','300mM','350mM','400mM']
 predict_b_savePath = './figer/{}不同盐浓度预测的b波/{}/'.format(wheat,localtime)
 if os.path.exists(predict_b_savePath) == True:
@@ -35,8 +42,7 @@ else:
     print('每个盐浓度预测时候的模型保存在文件夹:"{}"'.format(predict_b_savePath))
 
 # df_T = pd.read_csv('../数据集/{}-9预测数据集标签是0-8.csv'.format(wheat)).T
-df_T = pd.read_csv('../Datasets/DK_DS2_1.csv').T
-
+df_T = pd.read_csv('Datasets/LD_DS2_54.csv').T
 
 xx1,yy1 = data_dispose(df_T) # 调用切分数据函数
 xx = np.array(xx1) # /100
@@ -53,33 +59,25 @@ test_b = targets[:, :-1]
 test_label = targets[: ,-1]*100
 test_label = test_label.astype(np.int32)
 if wheat == 'DK':
-    model = keras.models.load_model('../model/LD-9分类_acc0.8245614035087719.h5')
+    model = keras.models.load_model('model/DK_pcc_0.9114367818861696.h5')
 else:
-    model = keras.models.load_model('../model/LD_pcc_0.9042618886525235.h5') # load模型
-# model.summary()
+    model = keras.models.load_model('model/LD_pcc_0.9042618886525235.h5') # load模型
 
-sub_model = tf.keras.models.Model( inputs = model.input, outputs = model.get_layer('Den2').output )
-# 查看一下子模型的结果：
-sub_model.summary()
+l = model.predict(test_a)
 
-l = sub_model.predict(test_a)
-print(l.shape)
+# 保存每一个盐浓度的预测波形,使用模型的时候在用
+for salt in range(9):
+    # 根据标签选择测试集
+    test_x = test_a[test_label == salt,:]
+    test_y = test_b[test_label == salt,:]
+    y_pred = l[test_label == salt,:]
+    print('预测的小麦品种为{},数据有{},盐刺激浓度为:{}'.format(wheat,test_x.shape[0],test[salt]))
 
-# plt.figure(figsize=(12, 12))
-for x in range(0, 12):
-    ax = plt.subplot(3, 4, x + 1)
-    label_tmp = l[ :, x]
-    plt.plot(label_tmp.reshape(9,1))
+    print(test_x.shape)
 
-    # 去除坐标轴
-    plt.xticks([])
-    plt.yticks([])
-    # 去除黑框
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-
-plt.tight_layout()
-plt.savefig('submodel.jpg')
+    # 需要输出预测的评价指标
+    ave_pcc, ave_fre, ave_mse = assessment(test_b=test_y,
+                                           l=y_pred,
+                                           salt=salt, wheat=wheat)
+    print(ave_fre)
 

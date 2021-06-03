@@ -1,7 +1,3 @@
-from sklearn.model_selection import KFold
-import numpy as np
-import matplotlib.pyplot as plt
-from util.model_1 import model_3,cnn_model_2,cnn_model
 import math
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_squared_error
@@ -9,8 +5,14 @@ from util.frechet import get_similarity
 import time
 localtime = time.asctime( time.localtime(time.time()) )
 from numpy import argmax
+from sklearn.model_selection import KFold
+import numpy as np
+import matplotlib.pyplot as plt
+from util.model_1 import model_3,cnn_model_2,cnn_model
 from sklearn.metrics import roc_curve, auc
 from scipy import interp
+from util.eva_9_class import eva_9_class
+
 
 def kfold(inputs, targets,wheat,salt):
     num_folds = 3
@@ -135,7 +137,7 @@ def kfold_cnn_2(inputs, targets,salt,ab,epochs,model_name):
         #   打印模型训练时的评价指标
          # Generate generalization metrics
         y_pred = model.predict(inputs[test])
-        model.save('../model/耐盐性分类/{}_{}_KFlod={}_acc{:.4}.h5'.format(model_name,salt_value[salt],fold_no,acc))
+        # model.save('model/耐盐性分类/{}_{}_KFlod={}_acc{:.4}.h5'.format(model_name,salt_value[salt],fold_no,acc))
 
         fpr, tpr, thresholds  =  roc_curve(targets[test][:,1], y_pred[:,1]) 
         tprs.append(interp(mean_fpr,fpr,tpr))
@@ -177,3 +179,60 @@ def kfold_cnn_2(inputs, targets,salt,ab,epochs,model_name):
         print('> Fold {} - acc: {:.4} %'.format(i+1,acc_per_fold[i]))
     print('Average scores for all folds:')
     print('> acc: {:.4} (+- {:.4})'.format(np.mean(acc_per_fold),np.std(acc_per_fold)))  
+
+
+
+
+def kfold_cnn_9(inputs, targets,epochs,wheat):
+    num_folds = 5
+    acc_list, kappa_list, ham_distance_list = [],[],[]
+    mean_fpr = np.linspace(0, 1, 100)
+
+    epochs = epochs
+    salt_value = ['0mM', '50mM', '100mM', '150mM', '200mM', '250mM', '300mM', '350mM', '400mM']
+    kfold = KFold(n_splits=num_folds, shuffle=True)
+    # K-fold Cross Validation model evaluation
+    fold_no = 1
+    for train, test in kfold.split(inputs, targets):
+        print(f'test datasets number is {inputs[test].shape[0]}')
+
+        # 预测-model_3效果最好
+        model = cnn_model(input_size=inputs[train].shape[1])
+
+        # verbose：日志显示，0为不在标准输出流输出日志信息，1为输出进度条记录，2为每个epoch输出一行记录
+        history = model.fit(inputs[train],
+                            targets[train],
+                            epochs=epochs,
+                            verbose=0,
+                            validation_split=0.2)  # ephos=1000 容易过拟合
+
+        acc = model.evaluate(inputs[test], targets[test], verbose=0)[1]
+        # print("\033[32m 9分类准确率为{:.4}\033[0m".format(acc)) # 调整terminal 输出的颜色。
+
+        #   打印模型训练时的评价指标
+        # Generate generalization metrics
+        y_pred = model.predict(inputs[test])
+        acc,kappa,ham_distance = eva_9_class(l=y_pred, test_y=targets[test], wheat="DK")
+        # 保存每一折里面的评价指标
+        acc_list.append(acc)
+        kappa_list.append(kappa)
+        ham_distance_list.append(ham_distance)
+
+        # model.save('model/耐盐性分类/{}_{}_KFlod={}_acc{:.4}.h5'.format(model_name,salt_value[salt],fold_no,acc))
+        print(f'这是第{fold_no}折')
+        fold_no = fold_no+1
+
+    aaa = ['0mM', '50mM', '100mM', '150mM', '200mM', '250mM', '300mM', '350mM', '400mM']
+    print(f'预测的小麦品种为{wheat}')
+    print('------------------------------------------------------------------------')
+    print('pcc fre mae per fold')
+    for i in range(0, len(acc_list)):
+        print('------------------------------------------------------------------------')
+        print(f'> Fold {i + 1} - acc: {acc_list[i]} - kappa: {kappa_list[i]} - ham_distance:{ham_distance_list[i]}%')
+    print('------------------------------------------------------------------------')
+    print('Average scores for all folds:')
+    print(f'> acc: {np.mean(acc_list)} (+- {np.std(acc_list)})')
+    print(f'> kappa: {np.mean(kappa_list)} (+- {np.std(kappa_list)})')
+    print(f'> ham_distance: {np.mean(ham_distance_list)} (+- {np.std(ham_distance_list)})')
+
+    print('------------------------------------------------------------------------')
