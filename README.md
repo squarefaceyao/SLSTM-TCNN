@@ -39,6 +39,12 @@ python3 pred_train.py
  ```
 python3 pred_use.py
 
+```
+
+## 盐刺激浓度识别模型（SCDM）
+
+```
+python3 k_cnn_9.py
 
 ```
 

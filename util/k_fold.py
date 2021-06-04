@@ -1,4 +1,6 @@
 import math
+import os
+
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_squared_error
 from util.frechet import get_similarity
@@ -180,10 +182,14 @@ def kfold_cnn_2(inputs, targets,salt,ab,epochs,model_name):
     print('Average scores for all folds:')
     print('> acc: {:.4} (+- {:.4})'.format(np.mean(acc_per_fold),np.std(acc_per_fold)))  
 
+def kfold_cnn_9(inputs, targets,epochs,wheat,save_model):
+    model_savePath = 'model/{}_SCDM/{}/'.format(wheat, localtime)
+    if os.path.exists(model_savePath) == True:
+        print('SCDM save path:"{}"'.format(model_savePath))
+    else:
+        os.makedirs(model_savePath)
+        print('SCDM save path::"{}"'.format(model_savePath))
 
-
-
-def kfold_cnn_9(inputs, targets,epochs,wheat):
     num_folds = 5
     acc_list, kappa_list, ham_distance_list = [],[],[]
     mean_fpr = np.linspace(0, 1, 100)
@@ -206,9 +212,6 @@ def kfold_cnn_9(inputs, targets,epochs,wheat):
                             verbose=0,
                             validation_split=0.2)  # ephos=1000 容易过拟合
 
-        acc = model.evaluate(inputs[test], targets[test], verbose=0)[1]
-        # print("\033[32m 9分类准确率为{:.4}\033[0m".format(acc)) # 调整terminal 输出的颜色。
-
         #   打印模型训练时的评价指标
         # Generate generalization metrics
         y_pred = model.predict(inputs[test])
@@ -217,12 +220,15 @@ def kfold_cnn_9(inputs, targets,epochs,wheat):
         acc_list.append(acc)
         kappa_list.append(kappa)
         ham_distance_list.append(ham_distance)
-
-        # model.save('model/耐盐性分类/{}_{}_KFlod={}_acc{:.4}.h5'.format(model_name,salt_value[salt],fold_no,acc))
+        acc=round(acc,4)
+        if save_model == True:
+            model.save(model_savePath + f'{fold_no}kflod_acc_{acc}.h5')
+            print('已经保存模型')
+        else:
+            print('没有保存模型')
         print(f'这是第{fold_no}折')
-        fold_no = fold_no+1
+        fold_no = fold_no + 1
 
-    aaa = ['0mM', '50mM', '100mM', '150mM', '200mM', '250mM', '300mM', '350mM', '400mM']
     print(f'预测的小麦品种为{wheat}')
     print('------------------------------------------------------------------------')
     print('pcc fre mae per fold')
@@ -236,3 +242,13 @@ def kfold_cnn_9(inputs, targets,epochs,wheat):
     print(f'> ham_distance: {np.mean(ham_distance_list)} (+- {np.std(ham_distance_list)})')
 
     print('------------------------------------------------------------------------')
+
+    # 返回每折的平均值和标准差 标准差的平方 是 方差
+    return {'acc_mean':np.mean(acc_list),
+            'kappa_mean':np.mean(kappa_list),
+            'ham_mean':np.mean(ham_distance_list),
+            'acc_std':np.std(acc_list),
+            'kappa_std':np.std(kappa_list),
+            'ham_std':np.std(ham_distance_list)}
+
+

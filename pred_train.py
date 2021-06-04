@@ -69,10 +69,10 @@ num_folds = int(math.log(xx.shape[1]))+1
 kfold = KFold(n_splits=n_splits, shuffle=True)
 # K-fold Cross Validation model evaluation
 i_Mean_MSE, i_Mean_pcc, i_Mean_fre= [],[],[]
-i_Var_MSE, i_Var_pcc, i_Var_fre= [],[],[]
-CV_Mean_MSE, CV_Var_MSE = [],[]
-CV_Mean_pcc, CV_Var_pcc = [],[]
-CV_Mean_fre, CV_Var_fre = [],[]
+i_Std_MSE, i_Std_pcc, i_Std_fre= [],[],[]
+CV_Mean_MSE, CV_Std_MSE = [],[]
+CV_Mean_pcc, CV_Std_pcc = [],[]
+CV_Mean_fre, CV_Std_fre = [],[]
 #Repeat experiment i times
 for i in range(expriment_num):
     print(f'这是第{i}次实验')
@@ -133,9 +133,9 @@ for i in range(expriment_num):
     i_Mean_fre.append(np.mean(fre_per_fold))
 
     # 这里保存每次实验的结果 10折交叉验证评价指标的方差
-    i_Var_MSE.append(np.var(mse_per_fold, ddof=1))
-    i_Var_pcc.append(np.var(pcc_per_fold, ddof=1))
-    i_Var_fre.append(np.var(fre_per_fold, ddof=1))
+    i_Std_MSE.append(np.std(mse_per_fold))
+    i_Std_pcc.append(np.std(pcc_per_fold))
+    i_Std_fre.append(np.std(fre_per_fold))
 
     # 这里输出每次实验的结果
     print('------------------------------------------------------------------------')
@@ -145,9 +145,9 @@ for i in range(expriment_num):
         print(f'> Fold {i+1} - pcc: {pcc_per_fold[i]} - fre: {fre_per_fold[i]} - mse:{mse_per_fold[i]}%')
     print('------------------------------------------------------------------------')
     print('Average scores for all folds:')
-    print(f'> pcc: {np.mean(pcc_per_fold)} (+- {np.var(pcc_per_fold, ddof=1)})')
-    print(f'> fre: {np.mean(fre_per_fold)} (+- {np.var(fre_per_fold, ddof=1)})')
-    print(f'> mse: {np.mean(mse_per_fold)} (+- {np.var(mse_per_fold, ddof=1)})')
+    print(f'> pcc: {np.mean(pcc_per_fold)} (+- {np.Std(pcc_per_fold)})')
+    print(f'> fre: {np.mean(fre_per_fold)} (+- {np.Std(fre_per_fold)})')
+    print(f'> mse: {np.mean(mse_per_fold)} (+- {np.Std(mse_per_fold)})')
 
     print('------------------------------------------------------------------------')
 
@@ -155,20 +155,20 @@ for i in range(expriment_num):
 # 进行格式转换，保存为csv格式
 #Convert to numpy for convenience
 CV_Mean_MSE  = np.asarray(i_Mean_MSE)
-CV_Var_MSE  = np.asarray(i_Var_MSE)
+CV_Std_MSE  = np.asarray(i_Std_MSE)
 #Convert to numpy for convenience
 CV_Mean_pcc = np.asarray(i_Mean_pcc)
-CV_Var_pcc = np.asarray(i_Var_pcc)
+CV_Std_pcc = np.asarray(i_Std_pcc)
 
 CV_Mean_fre = np.asarray(i_Mean_fre)
-CV_Var_fre = np.asarray(i_Var_fre)
+CV_Std_fre = np.asarray(i_Std_fre)
 
 df = pd.DataFrame({"CV_Mean_MSE" : CV_Mean_MSE,
-                   "CV_Var_MSE" : CV_Var_MSE,
+                   "CV_Std_MSE" : CV_Std_MSE,
                    "CV_Mean_pcc" : CV_Mean_pcc,
-                   "CV_Var_pcc" : CV_Var_pcc,
+                   "CV_Std_pcc" : CV_Std_pcc,
                    "CV_Mean_fre" : CV_Mean_fre,
-                   "CV_Var_fre" : CV_Var_fre
+                   "CV_Std_fre" : CV_Std_fre
                    })
 
 df.to_csv(f"./result/{localtime}_CV_Result.csv", index=False)
