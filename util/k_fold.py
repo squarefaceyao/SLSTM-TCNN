@@ -183,15 +183,9 @@ def kfold_cnn_2(inputs, targets,salt,ab,epochs,model_name):
     print('> acc: {:.4} (+- {:.4})'.format(np.mean(acc_per_fold),np.std(acc_per_fold)))  
 
 def kfold_cnn_9(inputs, targets,epochs,wheat,save_model):
-    model_savePath = 'model/{}_SCDM/{}/'.format(wheat, localtime)
-    if os.path.exists(model_savePath) == True:
-        print('SCDM save path:"{}"'.format(model_savePath))
-    else:
-        os.makedirs(model_savePath)
-        print('SCDM save path::"{}"'.format(model_savePath))
 
     num_folds = 5
-    acc_list, kappa_list, ham_distance_list = [],[],[]
+    acc_list, kappa_list, ham_distance_list,auc_list = [],[],[],[]
     mean_fpr = np.linspace(0, 1, 100)
 
     epochs = epochs
@@ -215,13 +209,20 @@ def kfold_cnn_9(inputs, targets,epochs,wheat,save_model):
         #   打印模型训练时的评价指标
         # Generate generalization metrics
         y_pred = model.predict(inputs[test])
-        acc,kappa,ham_distance = eva_9_class(l=y_pred, test_y=targets[test], wheat="DK")
+        acc,kappa,ham_distance,auc = eva_9_class(l=y_pred, test_y=targets[test], wheat=wheat)
         # 保存每一折里面的评价指标
         acc_list.append(acc)
         kappa_list.append(kappa)
         ham_distance_list.append(ham_distance)
-        acc=round(acc,4)
+        auc_list.append(auc)
+
         if save_model == True:
+            model_savePath = 'model/{}_SCDM/{}/'.format(wheat, localtime)
+            if os.path.exists(model_savePath) == True:
+                print('SCDM save path:"{}"'.format(model_savePath))
+            else:
+                os.makedirs(model_savePath)
+                print('SCDM save path::"{}"'.format(model_savePath))
             model.save(model_savePath + f'{fold_no}kflod_acc_{acc}.h5')
             print('已经保存模型')
         else:
@@ -234,21 +235,25 @@ def kfold_cnn_9(inputs, targets,epochs,wheat,save_model):
     print('pcc fre mae per fold')
     for i in range(0, len(acc_list)):
         print('------------------------------------------------------------------------')
-        print(f'> Fold {i + 1} - acc: {acc_list[i]} - kappa: {kappa_list[i]} - ham_distance:{ham_distance_list[i]}%')
+        print(f'> Fold {i + 1} - acc: {acc_list[i]} - kappa: {kappa_list[i]} - ham_distance:{ham_distance_list[i]}- auc_list:{auc_list[i]}')
     print('------------------------------------------------------------------------')
     print('Average scores for all folds:')
     print(f'> acc: {np.mean(acc_list)} (+- {np.std(acc_list)})')
     print(f'> kappa: {np.mean(kappa_list)} (+- {np.std(kappa_list)})')
     print(f'> ham_distance: {np.mean(ham_distance_list)} (+- {np.std(ham_distance_list)})')
+    print(f'> auc: {np.mean(auc_list)} (+- {np.std(auc_list)})')
 
     print('------------------------------------------------------------------------')
 
     # 返回每折的平均值和标准差 标准差的平方 是 方差
-    return {'acc_mean':np.mean(acc_list),
-            'kappa_mean':np.mean(kappa_list),
-            'ham_mean':np.mean(ham_distance_list),
-            'acc_std':np.std(acc_list),
-            'kappa_std':np.std(kappa_list),
-            'ham_std':np.std(ham_distance_list)}
+    return {'acc_mean':np.round(np.mean(acc_list),4),
+            'kappa_mean':np.round(np.mean(kappa_list),4),
+            'ham_mean':np.round(np.mean(ham_distance_list),4),
+            'auc_mean':np.round(np.mean(auc_list),4),
+            'acc_std':np.round(np.std(acc_list),4),
+            'kappa_std':np.round(np.std(kappa_list),4),
+            'ham_std':np.round(np.std(ham_distance_list),4),
+            'auc_std':np.round(np.std(auc_list),4)
+            }
 
 
