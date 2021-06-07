@@ -58,7 +58,14 @@ for s in range(9):
 
     l = model.predict(test_a)
 
-    pd.DataFrame(np.hstack((np.squeeze(xx), l * canshu[s]))).T.to_csv('result/{}_{}salt_predict_ab.csv'.format(wheat,salt[s]))  # 横向合并合并预测的b波
+    xx  = np.hstack((np.squeeze(xx), l * canshu[s]))
+    # 这里做的是区分品种，所以需要生成新的标签
+
+    y = np.array([s] * xx.shape[0])  # DK 生成标签
+    y = y[:, np.newaxis]  # y 扩充一个维度，拼接到x的后面 z
+
+
+    pd.DataFrame(np.hstack((xx,y))).to_csv('result/feak_{}_{}salt_predict_ab.csv'.format(wheat,salt[s]))  # 横向合并合并预测的b波
 
     print(f"输出的数据纬度{l.shape}")
 
