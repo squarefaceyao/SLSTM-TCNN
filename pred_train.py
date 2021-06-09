@@ -35,10 +35,10 @@ fontsize = 21
 # 保存评价指标
 
 #输入的参数
-expriment_num = 3  # 试验次数。进行几次交叉验证
+expriment_num = 1  # 试验次数。进行几次交叉验证
 epochs = 600 # 训练次数，600
 n_splits = 10 # 折数，n_splits折交叉验证,10
-wheat = 'LD' # DK or LD
+wheat = 'DK' # DK or LD
 
 # 保存训练的模型
 model_savePath = 'model/{}不同盐浓度预测模型/{}/'.format(wheat,localtime)
@@ -145,9 +145,9 @@ for i in range(expriment_num):
         print(f'> Fold {i+1} - pcc: {pcc_per_fold[i]} - fre: {fre_per_fold[i]} - mse:{mse_per_fold[i]}%')
     print('------------------------------------------------------------------------')
     print('Average scores for all folds:')
-    print(f'> pcc: {np.mean(pcc_per_fold)} (+- {np.Std(pcc_per_fold)})')
-    print(f'> fre: {np.mean(fre_per_fold)} (+- {np.Std(fre_per_fold)})')
-    print(f'> mse: {np.mean(mse_per_fold)} (+- {np.Std(mse_per_fold)})')
+    print(f'> pcc: {np.mean(pcc_per_fold)} (+- {np.std(pcc_per_fold)})')
+    print(f'> fre: {np.mean(fre_per_fold)} (+- {np.std(fre_per_fold)})')
+    print(f'> mse: {np.mean(mse_per_fold)} (+- {np.std(mse_per_fold)})')
 
     print('------------------------------------------------------------------------')
 
@@ -171,7 +171,7 @@ df = pd.DataFrame({"CV_Mean_MSE" : CV_Mean_MSE,
                    "CV_Std_fre" : CV_Std_fre
                    })
 
-df.to_csv(f"./result/{localtime}_CV_Result.csv", index=False)
+df.to_csv(f"./result/SLSTM_TCNN_{wheat}_{localtime}_CV_Result.csv", index=False)
     
         
 
