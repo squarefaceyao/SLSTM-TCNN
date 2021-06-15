@@ -17,7 +17,7 @@ from util.eva_9_class import eva_9_class
 import seaborn as sns
 
 
-def k_SDCM_SLSTM_TCNN(inputs, targets,epochs,wheat,save_model):
+def k_SCDM_SLSTM_TCNN(inputs, targets,epochs,wheat,save_model):
 
     num_folds = 5
     acc_list, kappa_list, ham_distance_list,auc_list = [],[],[],[]
@@ -52,12 +52,12 @@ def k_SDCM_SLSTM_TCNN(inputs, targets,epochs,wheat,save_model):
         auc_list.append(auc)
 
         if save_model == True:
-            model_savePath = 'model/{}_/{}/'.format(wheat, localtime)
+            model_savePath = os.getcwd()+'/model/SCDM_SLSTM_TCNN_{}_/{}/'.format(wheat, localtime)
             if os.path.exists(model_savePath) == True:
-                print('SCDM save path:"{}"'.format(model_savePath))
+                print('SCDM_SLSTM_TCNN save path:"{}"'.format(model_savePath))
             else:
                 os.makedirs(model_savePath)
-                print('SCDM save path::"{}"'.format(model_savePath))
+                print('SCDM_SLSTM_TCNN save path::"{}"'.format(model_savePath))
             model.save(model_savePath + f'{fold_no}kflod_acc_{acc}.h5')
             print('已经保存模型')
         else:

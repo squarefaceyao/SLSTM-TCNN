@@ -1,3 +1,5 @@
+import time
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -8,7 +10,7 @@ from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.metrics import cohen_kappa_score #kaapa系数
 from sklearn.metrics import hamming_loss # 海明距离
 from numpy import argmax
-
+import os
 from sklearn.preprocessing import label_binarize
 
 sns.set(font_scale=2)
@@ -25,6 +27,15 @@ def cover(test_y):
     return yy2
 
 def eva_9_class(l,test_y,wheat):
+    now = int(round(time.time() * 1000))
+    localtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(now / 1000))
+    figure_savePath = os.getcwd() + '/figure/SCDM/'
+    if os.path.exists(figure_savePath) == True:
+        print('STCM figure save path:"{}"'.format(figure_savePath))
+    else:
+        os.makedirs(figure_savePath)
+        print('STCM figure save path::"{}"'.format(figure_savePath))
+
     s = 0
     for i in range(len(l)):
         if np.argmax(l[i]) == np.argmax(test_y[i]):
@@ -56,7 +67,7 @@ def eva_9_class(l,test_y,wheat):
     plt.xticks(rotation=40,fontsize=fontsize) #x轴刻度的字体大小（文本包含在pd_data中了）
     plt.yticks(fontsize=fontsize) #y轴刻度的字体大小（文本包含在pd_data中了）
     plt.title(f'{wheat}-{l.shape[0]}-9-clss',fontsize=fontsize) #图片标题文本和字体大小
-    figername = f"figer/{wheat}_acc is{acc}_number is {l.shape[0]}_9_clss.png"
+    figername = figure_savePath+f"{wheat}_acc is{acc}_number is {l.shape[0]}_9_clss.png"
     plt.savefig(figername,dpi=400)
     print(f"已保存9分类混淆矩阵,保存路径是{figername}")
 

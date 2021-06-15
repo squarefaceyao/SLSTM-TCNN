@@ -138,8 +138,8 @@ if __name__=='__main__':
     
     units=12
     
-    # model = model_4(units=units,input_size=588)
-    model = cnn_model_2(input_size=1176)
+    model = model_4(units=units,input_size=588)
+    # model = cnn_model_2(input_size=1176)
     
     # model = cnn_model(input_size=1176)
     # model4 = model_4(12,588)

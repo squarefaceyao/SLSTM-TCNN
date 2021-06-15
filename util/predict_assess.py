@@ -6,15 +6,17 @@ from sklearn.metrics import mean_squared_error
 from util.frechet import get_similarity
 import seaborn as sns
 import time
+import brewer2mpl
+
 localtime = time.asctime( time.localtime(time.time()) )
 # plt 图片大小
-sns.set(font_scale=1.5)
-fontsize = 32
+sns.set(font_scale=3.5)
+fontsize = 40
 
 def show_wave(l,test_a,test_b,salt,wheat,path):
     predict_b_savePath = path
     test = ['0mM','50mM','100mM','150mM','200mM','250mM','300mM','350mM','400mM']
-    plt.figure(figsize=(12,9))
+    plt.figure(figsize=(14,11))
     num = l.shape[0]    
     leng = l.shape[1]
     x1 = np.linspace(0,leng,leng) #numpy.linspace(开始，终值(含终值))，个数)
@@ -37,7 +39,7 @@ def show_wave(l,test_a,test_b,salt,wheat,path):
             plt.legend()  #显示上面的label
             
         plt.axis([0, leng+leng,-1.25,1.5])#设置坐标范围axis([xmin,xmax,ymin,ymax])
-        plt.xlabel('Time(s)',fontsize=fontsize, color='k') #x轴label的文本和字体大小
+        plt.xlabel('Time(2s)',fontsize=fontsize, color='k') #x轴label的文本和字体大小
         plt.ylabel('Normalized amplitude',fontsize=fontsize, color='k') #y轴label的文本和字体大小
         plt.xticks(rotation=0,fontsize=fontsize) #x轴刻度的字体大小（文本包含在pd_data中了）
         plt.yticks(fontsize=fontsize) #y轴刻度的字体大小（文本包含在pd_data中了）
