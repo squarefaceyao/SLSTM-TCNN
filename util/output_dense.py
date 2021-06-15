@@ -53,27 +53,29 @@ test_b = targets[:, :-1]
 test_label = targets[: ,-1]*100
 test_label = test_label.astype(np.int32)
 if wheat == 'DK':
-    model = keras.models.load_model('../model/LD-9分类_acc0.8245614035087719.h5')
+    model = keras.models.load_model('../model/DK_pcc_0.9114367818861696.h5')
 else:
     model = keras.models.load_model('../model/LD_pcc_0.9042618886525235.h5') # load模型
 # model.summary()
 
-sub_model = tf.keras.models.Model( inputs = model.input, outputs = model.get_layer('Den2').output )
+sub_model = tf.keras.models.Model( inputs = model.input, outputs = model.get_layer('lstm_1').output )
 # 查看一下子模型的结果：
 sub_model.summary()
 
 l = sub_model.predict(test_a)
-print(l.shape)
+print(l[:,:,1].shape)
+# label_tmp = l[ :, x]
 
-# plt.figure(figsize=(12, 12))
+plt.figure(figsize=(24, 24))
 for x in range(0, 12):
     ax = plt.subplot(3, 4, x + 1)
-    label_tmp = l[ :, x]
-    plt.plot(label_tmp.reshape(9,1))
+    label_tmp = l[ :, :, x]
+    plt.plot(label_tmp.reshape(147,1))
 
     # 去除坐标轴
     plt.xticks([])
     plt.yticks([])
+    plt.title(f'{x}')
     # 去除黑框
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -81,5 +83,7 @@ for x in range(0, 12):
     ax.spines['left'].set_visible(False)
 
 plt.tight_layout()
-plt.savefig('submodel.jpg')
+plt.legend()
+# plt.show()
+plt.savefig('../figure/LSTM_submodel22.jpg',dpi=400)
 
