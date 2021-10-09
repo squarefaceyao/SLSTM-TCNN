@@ -16,7 +16,7 @@ sns.set_style("white")
 输出保存在：plt.savefig(f'../figure/{model_name}_output2_{localtime}.jpg',dpi=400)
 """
 
-wheat = 'DK' # DK or LD
+wheat = 'LD' # DK or LD
 df_T = pd.read_csv('../Datasets/DK_DS2_1.csv').T
 
 xx1,yy1 = data_dispose(df_T) # 调用切分数据函数
@@ -36,15 +36,15 @@ test_label = test_label.astype(np.int32)
 if wheat == 'DK':
     model = keras.models.load_model('../model/DK_pcc_0.91.h5')
 else:
-    model = keras.models.load_model('../model/LD_pcc_0.9042618886525235.h5') # load模型
+    model = keras.models.load_model('../model/LD_pcc_0.89.h5') # load模型
 model.summary()
 
 model_name = 'SLSTM_TCNN'
-layername=['nor1','Max1','Conv1','tf_op_layer_mul_5','lstm_1','TC1']
+layername=['nor1','Max1','Conv1','tf_op_layer_mul_8','lstm_1','TC1']
 if model_name == 'SLSTM_TCNN':
-    layername2=['flatten','dense_16','dropout_5','dense_17']
+    layername2=['flatten','dense_25','dropout_8','dense_26']
 else:
-    layername2=['flatten','dense_16','dropout_5','dense_17']
+    layername2=['flatten','dense_25','dropout_8','dense_26']
 
 
 num = np.array(layername).shape[0]

@@ -13,11 +13,11 @@ localtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(now/1000))
 功能：输出SCDM模型每一层的输出
 输出保存在：plt.savefig(f'../figure/{model_name}_output2_{localtime}.jpg',dpi=400)
 """
-sns.set_context("talk",font_scale=2.5)
+sns.set_context("talk",font_scale=4)
 sns.set_style("white")
 
 # fontsize = 24
-length = 22
+length = 20
 width = 16
 mpl.rcParams['font.family'] = 'sans-serif'
 mpl.rcParams['font.sans-serif'] = 'NSimSun,Times New Roman'
@@ -95,7 +95,7 @@ for name,x in zip(layername2,range(0, num2)):
 
     if name=='Den2':
         plt.plot(l.reshape(l.shape[1], 1), 'o')
-        plt.title('SoftMax')
+        plt.title(f'{test2[x]}')
     else:
         plt.plot(l.reshape(l.shape[1], 1))
         plt.title(f'{test2[x]}')

@@ -10,8 +10,8 @@ import brewer2mpl
 
 localtime = time.asctime( time.localtime(time.time()) )
 # plt 图片大小
-sns.set(font_scale=3.5)
-fontsize = 40
+sns.set_context("talk",font_scale=2.5)
+sns.set_style("white")
 
 def show_wave(l,test_a,test_b,salt,wheat,path):
     predict_b_savePath = path
@@ -21,30 +21,29 @@ def show_wave(l,test_a,test_b,salt,wheat,path):
     leng = l.shape[1]
     x1 = np.linspace(0,leng,leng) #numpy.linspace(开始，终值(含终值))，个数)
     x2 = np.linspace(leng,leng+leng,leng)
-    for n in range(num):
+    for n in range(1):
         # print('正在保存第 {} 预测的波形'.format(n))
         y_pred = l[n]
         x_true = np.squeeze(test_a[n])
         y_true = test_b[n]
         if n==0:
-            plt.plot(x1, x_true, color='black', label='No Stimulation Values')
-            plt.plot(x2, y_true, 'b', label='True Stimulation Values')#'b'指：color='blue'
-            plt.plot(x2, y_pred, 'g', label='Predictions')#'b'指：color='blue'
+            plt.plot(x1, x_true, color='b', label='No Stimulation Values')
+            plt.plot(x2, y_true, 'r', label='True Stimulation Values')#'b'指：color='blue'
+            plt.plot(x2, y_pred, 'g' ,label='Predictions')#'b'指：color='blue'
             plt.legend()  #显示上面的label
             
         else:
-            plt.plot(x1, x_true, color='black')
-            plt.plot(x2, y_true, 'b')#'b'指：color='blue'
+            plt.plot(x1, x_true, color='b')
+            plt.plot(x2, y_true, 'r')#'b'指：color='blue'
             plt.plot(x2, y_pred, 'g')#'b'指：color='blue'
             plt.legend()  #显示上面的label
             
         plt.axis([0, leng+leng,-1.25,1.5])#设置坐标范围axis([xmin,xmax,ymin,ymax])
-        plt.xlabel('Time(2s)',fontsize=fontsize, color='k') #x轴label的文本和字体大小
-        plt.ylabel('Normalized amplitude',fontsize=fontsize, color='k') #y轴label的文本和字体大小
-        plt.xticks(rotation=0,fontsize=fontsize) #x轴刻度的字体大小（文本包含在pd_data中了）
-        plt.yticks(fontsize=fontsize) #y轴刻度的字体大小（文本包含在pd_data中了）
-        plt.title('{} {} salt stimulation'.format(wheat,test[salt]),fontsize=fontsize)  #标题
-        plt.grid(linestyle='-.')
+        plt.xlabel('Time(2s)', color='k') #x轴label的文本和字体大小
+        plt.ylabel('Normalized amplitude', color='k') #y轴label的文本和字体大小
+        plt.xticks(rotation=0) #x轴刻度的字体大小（文本包含在pd_data中了）
+        plt.title('{} {} salt stimulation'.format(wheat,test[salt]))  #标题
+        # plt.grid(linestyle='-.')
     # plt.show()
     plt.savefig( predict_b_savePath +'{} {} salt stimulation-{}'.format(wheat,test[salt],num),dpi=400)
     plt.close()

@@ -14,19 +14,19 @@ localtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(now/1000))
 输出保存在：plt.savefig(f'../figure/{model_name}_output2_{localtime}.jpg',dpi=400)
 """
 
-sns.set_context("talk",font_scale=2.5)
+sns.set_context("talk",font_scale=3)
 sns.set_style("white")
 
-length = 22
+length = 19
 width = 16
 mpl.rcParams['font.family'] = 'sans-serif'
 mpl.rcParams['font.sans-serif'] = 'NSimSun,Times New Roman'
 
 wheat = 'DK'
-model_name = 'STCM+SLSTM_TCNN' #'STCM+SLSTM_TCNN'
+model_name = 'STCM' #'STCM+SLSTM_TCNN'
 
 df_T = pd.read_csv(f'../Datasets/{wheat}_1_STCM.csv')
-
+df_T = df_T/100
 print(f'整个数据集的数量{df_T.shape[1]}')
 
 #区分ab波和标签
@@ -72,7 +72,7 @@ for name,x in zip(layername,range(0, num)):
     sub_model = keras.models.Model( inputs = model.input, outputs = model.get_layer(name).output )
     l = sub_model.predict(xx_)
     print(l.shape)
-    ax = plt.subplot(3, 3, x + 1)
+    ax = plt.subplot(3, 2, x + 1)
     label_tmp = l[ :, :, x]
     plt.plot(label_tmp.reshape(l.shape[1],1))
     plt.title(f'{test[x]}')
@@ -90,10 +90,10 @@ for name,x in zip(layername2,range(0, num2)):
     sub_model = keras.models.Model( inputs = model.input, outputs = model.get_layer(name).output )
     l = sub_model.predict(xx_)
     print(l.shape)
-    ax = plt.subplot(3, 3, x + 1)
+    ax = plt.subplot(3, 2, x + 1)
     if name == 'Den4':
         plt.plot(l.reshape(l.shape[1], 1),'o')
-        plt.title('SoftMax')
+        plt.title(f'{test2[x]}')
     else:
         plt.plot(l.reshape(l.shape[1],1))
         plt.title(f'{test2[x]}')
