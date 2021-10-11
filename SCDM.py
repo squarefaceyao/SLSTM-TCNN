@@ -18,8 +18,10 @@ mpl.rcParams['font.family'] = 'sans-serif'
 mpl.rcParams['font.sans-serif'] = 'NSimSun,Times New Roman'
 
 wheat = 'LD'
-expr_num = 3 # 进行几次实验，试验次数过多可能会保存，原因估计尚不清楚。
-df_T = pd.read_csv(f'Datasets/{wheat}_DSC_180.csv')
+expr_num = 1 # 进行几次实验，试验次数过多可能会保存，原因估计尚不清楚。
+# df_T = pd.read_csv(f'Datasets/{wheat}_DSC_180.csv')
+df_T = pd.read_csv(f'Datasets/180条-{wheat}-0_400mM-9fenlei.csv')
+# df_T = pd.read_csv(f'Datasets/666条-{wheat}-0_400mM-9fenlei.csv')
 
 print(f'整个数据集的数量{df_T.shape[0]}')
 
@@ -46,4 +48,4 @@ for i in range(expr_num):
 
 now = int(round(time.time()*1000))
 localtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(now/1000))
-pd.DataFrame(test).to_csv(f"result/SCDM_{wheat}_{localtime}.csv")
+pd.DataFrame(test).to_csv(f"result/SCDM{wheat}_{localtime}.csv")

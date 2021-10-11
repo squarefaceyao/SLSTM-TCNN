@@ -38,7 +38,7 @@ fontsize = 21
 expriment_num = 1  # 试验次数。进行几次交叉验证
 epochs = 600 # 训练次数，600
 n_splits = 10 # 折数，n_splits折交叉验证,10
-wheat = 'DK' # DK or LD
+wheat = 'LD' # DK or LD
 
 # 保存训练的模型
 model_savePath = 'model/{}不同盐浓度预测模型/{}/'.format(wheat,localtime)

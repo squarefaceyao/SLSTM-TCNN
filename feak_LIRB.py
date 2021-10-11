@@ -27,16 +27,14 @@ localtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(now/1000))
 """
 # 根据小麦品种选择模型保存的路径
 
-path = "../model/LD-use" #文件夹目录
 canshu = [1.12,1.23,1.31,1.37,1.43,1.51,1.6,1.7,1.8] # 为了每次保存的a波形都不一样。波形乘的数字越大，幅值越低。
 salt = [0,50,100,150,200,250,300,350,400] # 根据salt值选择模型和保存预测的数据
 #输入的参数
-wheat = 'LD' # DK or LD
+wheat = 'DK' # DK or LD
 test = ['0mM','50mM','100mM','150mM','200mM','250mM','300mM','350mM','400mM']
-
 for s in range(9):
-
-    df_T = pd.read_csv(f'Datasets/{wheat}_DS2_54.csv').T
+    cc = canshu[s]
+    df_T = pd.read_csv(f'Datasets/{wheat}_DS2_54_test.csv').T
 
     xx1,yy1 = data_dispose(df_T) # 调用切分数据函数
     xx = np.array(xx1)
@@ -54,22 +52,22 @@ for s in range(9):
     if wheat == 'DK':
         model = keras.models.load_model('model/DK_pcc_0.9114367818861696.h5')
     else:
-        model = keras.models.load_model('model/LD_pcc_0.9042618886525235.h5') # load模型
+        model = keras.models.load_model('model/pcc_0.9245995283126831.h5') # load模型
 
     l = model.predict(test_a)
 
-    xx  = np.hstack((np.squeeze(xx), l * canshu[s]))
+    xx  = np.hstack((np.squeeze(xx), l))
+    xx = np.round(xx,3)*100
     # 这里做的是区分品种，所以需要生成新的标签
 
     y = np.array([s] * xx.shape[0])  # DK 生成标签
     y = y[:, np.newaxis]  # y 扩充一个维度，拼接到x的后面 z
+    all_data=np.hstack((xx,y))
 
-
-    pd.DataFrame(np.hstack((xx,y))).to_csv('result/feak_{}_{}salt_predict_ab.csv'.format(wheat,salt[s]))  # 横向合并合并预测的b波
+    pd.DataFrame(all_data).to_csv('result/feak_{}_{}salt_predict_ab.csv'.format(wheat,salt[s]))  # 横向合并合并预测的b波
 
     print(f"输出的数据纬度{l.shape}")
 
     del model
-
 
 

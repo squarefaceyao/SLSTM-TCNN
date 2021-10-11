@@ -32,9 +32,9 @@ from fnmatch import fnmatch
 canshu = [1.12,1.23,1.31,1.37,1.43,1.51,1.6,1.7,1.8] # 为了每次保存的a波形都不一样。波形乘的数字越大，幅值越低。
 salt = [0,50,100,150,200,250,300,350,400] # 根据salt值选择模型和保存预测的数据
 #输入的参数
-wheat = 'LD' # DK or LD
+wheat = 'DK' # DK or LD
 test = ['0mM','50mM','100mM','150mM','200mM','250mM','300mM','350mM','400mM']
-predict_b_savePath = './figer/{}不同盐浓度预测的b波/{}/'.format(wheat,localtime)
+predict_b_savePath = './figure/{}不同盐浓度预测的b波/{}/'.format(wheat,localtime)
 if os.path.exists(predict_b_savePath) == True:
     print('每个盐浓度预测时候的模型保存在文件夹:"{}"'.format(predict_b_savePath))
 else:
@@ -59,9 +59,9 @@ test_b = targets[:, :-1]
 test_label = targets[: ,-1]*100
 test_label = test_label.astype(np.int32)
 if wheat == 'DK':
-    model = keras.models.load_model('model/DK_pcc_0.9114367818861696.h5')
+    model = keras.models.load_model('model/2DK_pcc_0.9114367818861696.h5')
 else:
-    model = keras.models.load_model('model/LD_pcc_0.9042618886525235.h5') # load模型
+    model = keras.models.load_model('model/2LD_pcc_0.9042618886525235.h5') # load模型
 
 l = model.predict(test_a)
 
@@ -80,4 +80,9 @@ for salt in range(9):
                                            l=y_pred,
                                            salt=salt, wheat=wheat)
     print(ave_fre)
+
+    show_wave(l=y_pred,
+            test_a=test_x,test_b=test_y,
+            salt=salt,wheat=wheat,
+            path=predict_b_savePath)
 
